@@ -1,5 +1,5 @@
 import {MethodToStub} from "../src/MethodToStub";
-import {instance, mock, when} from "../src/ts-mockito";
+import {instance, mock, imock, when, verify} from "../src/ts-mockito";
 import {Bar} from "./utils/Bar";
 
 describe("mocking", () => {
@@ -151,6 +151,41 @@ describe("mocking", () => {
             // then
 
         });
+    });
+
+    describe("mocking an interface", () => {
+        let mockedFoo: SampleInterface;
+        let foo: SampleInterface;
+
+        if (typeof Proxy !== "undefined") {
+            
+            it("can verify call count", () => {
+                // given
+                mockedFoo = imock();
+                foo = instance(mockedFoo);
+
+                // when
+                let result = foo.sampleMethod();
+
+                // then
+                verify(mockedFoo.sampleMethod()).called();
+                expect(result).toBe(null);
+            });
+
+            it("can setup call actions", () => {
+                // given
+                mockedFoo = imock();
+                foo = instance(mockedFoo);
+                when(mockedFoo.sampleMethod()).thenReturn(5);
+
+                // when
+                let result = foo.sampleMethod();
+
+                // then
+                verify(mockedFoo.sampleMethod()).called();
+                expect(result).toBe(5);
+            });
+        }
     });
 });
 
