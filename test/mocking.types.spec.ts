@@ -206,6 +206,26 @@ describe("mocking", () => {
                 verify(mockedFoo.sampleMethod()).called();
                 expect(result).toBe(5);
             });
+
+            it("can return interface mock in a Promise", async () => {
+                // given
+                const mockedFooGetter: {
+                    getFoo(): Promise<SampleInterface>;
+                } = imock();
+                const fooGetter = instance(mockedFooGetter);
+                mockedFoo = imock();
+                foo = instance(mockedFoo);
+                // uncomment next line to make test pass
+                //foo = {} as SampleInterface;
+                when(mockedFooGetter.getFoo()).thenResolve(foo);
+
+                // when
+                const result = await fooGetter.getFoo();
+
+                // then
+                verify(mockedFooGetter.getFoo()).called();
+                expect(result).toBe(foo);
+            });
         }
     });
 });
